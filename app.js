@@ -710,13 +710,19 @@ async function syncCloudAvatars() {
     const json = await res.json();
     if (json && json.data) {
       let hasUpdate = false;
-      for (const [studentId, avatarData] of Object.entries(json.data)) {
-        if (avatarData) {
-          const local = localStorage.getItem('mgimo_custom_avatar_' + studentId);
-          if (local !== avatarData) {
-            localStorage.setItem('mgimo_custom_avatar_' + studentId, avatarData);
+      for (const [studentId, cloudData] of Object.entries(json.data)) {
+        const local = localStorage.getItem('mgimo_custom_avatar_' + studentId);
+        
+        // 1. If cloud has a valid dataUrl and local doesn't have it, pull from cloud:
+        if (cloudData && typeof cloudData === 'string' && cloudData.startsWith('data:image/')) {
+          if (local !== cloudData) {
+            localStorage.setItem('mgimo_custom_avatar_' + studentId, cloudData);
             hasUpdate = true;
           }
+        }
+        // 2. If local has a photo but cloud is empty/out of sync, auto-push to cloud:
+        else if (local && typeof local === 'string' && local.startsWith('data:image/')) {
+          pushAvatarToCloud(studentId, local);
         }
       }
       if (hasUpdate) {
@@ -755,33 +761,65 @@ async function pushAvatarToCloud(studentId, avatarData) {
   }
 }
 
-// Compress avatar via Canvas down to crisp ~280x280 JPEG (~25KB)
-// Prevents Safari iOS QuotaExceededError and enables instant syncing
-function compressAvatar(file, maxDim = 280, quality = 0.82) {
+// Compress avatar via Canvas down to crisp ~260x260 JPEG (~20-25KB)
+// Bulletproof on iOS Safari (handles HEIC, camera files, quota limits)
+async function compressAvatar(file, maxDim = 260, quality = 0.80) {
+  // 1. Try native createImageBitmap (hardware decoded on iOS 15+)
+  if (typeof createImageBitmap === 'function') {
+    try {
+      const bitmap = await createImageBitmap(file);
+      const canvas = document.createElement('canvas');
+      let { width, height } = bitmap;
+      if (width > height) {
+        if (width > maxDim) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        }
+      } else {
+        if (height > maxDim) {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(bitmap, 0, 0, width, height);
+      return canvas.toDataURL('image/jpeg', quality);
+    } catch (e) {
+      console.warn('createImageBitmap fallback to FileReader:', e);
+    }
+  }
+
+  // 2. Standard Canvas + Image fallback
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
       img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-        if (width > height) {
-          if (width > maxDim) {
-            height = Math.round((height * maxDim) / width);
-            width = maxDim;
+        try {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          if (width > height) {
+            if (width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
           }
-        } else {
-          if (height > maxDim) {
-            width = Math.round((width * maxDim) / height);
-            height = maxDim;
-          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        } catch (err) {
+          resolve(e.target.result);
         }
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', quality));
       };
       img.onerror = () => resolve(e.target.result);
       img.src = e.target.result;
@@ -2785,8 +2823,6 @@ function generateCrispQrSvg(payload) {
     if (r >= N - 8 && c <= 7) return true;
     if (r === 6 || c === 6) return true;
     if (r >= 16 && r <= 20 && c >= 16 && c <= 20) return true;
-    // Central shield emblem zone
-    if (r >= 9 && r <= 15 && c >= 9 && c <= 15) return true;
     return false;
   }
 
@@ -2798,7 +2834,7 @@ function generateCrispQrSvg(payload) {
     }
   }
 
-  // Build crisp vector SVG rects
+  // Build crisp standard vector SVG rects (identical to standard QR code)
   let rects = '';
   const moduleSize = 100 / N;
   for (let r = 0; r < N; r++) {
@@ -2813,11 +2849,6 @@ function generateCrispQrSvg(payload) {
     <svg viewBox="0 0 100 100" class="w-full h-full" shape-rendering="crispEdges">
       <rect width="100" height="100" fill="#ffffff" />
       ${rects}
-      <!-- Center Official Emblem Shield -->
-      <rect x="36" y="36" width="28" height="28" rx="5" fill="#ffffff" />
-      <rect x="38" y="38" width="24" height="24" rx="4" fill="#0A192F" />
-      <text x="50" y="50" font-size="7" font-weight="900" text-anchor="middle" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, sans-serif" letter-spacing="0.5">МГИМО</text>
-      <text x="50" y="57" font-size="4.5" font-weight="700" text-anchor="middle" fill="#38BDF8" font-family="-apple-system, BlinkMacSystemFont, sans-serif">СКУД</text>
     </svg>
   `;
 }
