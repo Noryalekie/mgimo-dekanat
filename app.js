@@ -718,85 +718,67 @@ function triggerAvatarUpload() {
 
 // Compress avatar via Canvas down to crisp ~180x180 JPEG (~10-15KB)
 // 100% reliable hardware-accelerated on iOS Safari, Android, and Desktop
-function compressAvatar(file, maxDim = 180, quality = 0.80) {
+function compressAvatar(file, maxDim = 180, quality = 0.82) {
   return new Promise((resolve) => {
-    // 1. Try native createImageBitmap (iOS 15+, Mac Safari, Chrome)
-    if (typeof createImageBitmap === 'function') {
-      createImageBitmap(file).then(bitmap => {
-        try {
-          const canvas = document.createElement('canvas');
-          let w = bitmap.width;
-          let h = bitmap.height;
-          if (w > h) {
-            if (w > maxDim) {
-              h = Math.round((h * maxDim) / w);
-              w = maxDim;
+    try {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          try {
+            const canvas = document.createElement('canvas');
+            let w = img.width;
+            let h = img.height;
+            if (w > h) {
+              if (w > maxDim) {
+                h = Math.round((h * maxDim) / w);
+                w = maxDim;
+              }
+            } else {
+              if (h > maxDim) {
+                w = Math.round((w * maxDim) / h);
+                h = maxDim;
+              }
             }
-          } else {
-            if (h > maxDim) {
-              w = Math.round((w * maxDim) / h);
-              h = maxDim;
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const dataUrl = canvas.toDataURL('image/jpeg', quality);
+            resolve(dataUrl);
+          } catch (canvasErr) {
+            console.warn('Canvas export failed, using raw dataUrl if small:', canvasErr);
+            if (e.target && e.target.result && e.target.result.length < 500000) {
+              resolve(e.target.result);
+            } else {
+              resolve(null);
             }
           }
-          canvas.width = w;
-          canvas.height = h;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(bitmap, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/jpeg', quality));
-        } catch (_) {
-          fallbackCompress(file, maxDim, quality, resolve);
-        }
-      }).catch(() => {
-        fallbackCompress(file, maxDim, quality, resolve);
-      });
-      return;
-    }
-    fallbackCompress(file, maxDim, quality, resolve);
-  });
-}
-
-function fallbackCompress(file, maxDim, quality, resolve) {
-  const blobUrl = URL.createObjectURL(file);
-  const img = new Image();
-  img.onload = function() {
-    URL.revokeObjectURL(blobUrl);
-    try {
-      const canvas = document.createElement('canvas');
-      let w = img.width;
-      let h = img.height;
-      if (w > h) {
-        if (w > maxDim) {
-          h = Math.round((h * maxDim) / w);
-          w = maxDim;
-        }
-      } else {
-        if (h > maxDim) {
-          w = Math.round((w * maxDim) / h);
-          h = maxDim;
-        }
-      }
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      resolve(canvas.toDataURL('image/jpeg', quality));
-    } catch (_) {
+        };
+        img.onerror = function(err) {
+          console.warn('Image load failed in compressAvatar:', err);
+          resolve(null);
+        };
+        img.src = e.target.result;
+      };
+      reader.onerror = function(err) {
+        console.warn('FileReader error:', err);
+        resolve(null);
+      };
+      reader.readAsDataURL(file);
+    } catch (outerErr) {
+      console.warn('compressAvatar error:', outerErr);
       resolve(null);
     }
-  };
-  img.onerror = function() {
-    URL.revokeObjectURL(blobUrl);
-    resolve(null);
-  };
-  img.src = blobUrl;
+  });
 }
 
 async function handleStudentAvatarUpload(event) {
   const file = event.target && event.target.files && event.target.files[0];
   if (!file) return;
 
-  if (file.size > 15 * 1024 * 1024) {
-    showToast('⚠️ Размер фото не должен превышать 15 МБ');
+  if (file.size > 20 * 1024 * 1024) {
+    showToast('⚠️ Размер фото не должен превышать 20 МБ');
     return;
   }
 
@@ -812,7 +794,7 @@ async function handleStudentAvatarUpload(event) {
     const student = getCurrentStudent();
     const studentId = student.profile.id;
 
-    // Save directly to localStorage
+    // Save directly to localStorage for this student
     try {
       localStorage.setItem('mgimo_custom_avatar_' + studentId, compressedDataUrl);
     } catch (storageErr) {
@@ -820,8 +802,13 @@ async function handleStudentAvatarUpload(event) {
       try {
         localStorage.removeItem('mgimo_custom_avatar_' + studentId);
         localStorage.setItem('mgimo_custom_avatar_' + studentId, compressedDataUrl);
-      } catch (_) {}
+      } catch (e2) {
+        console.error('Failed to store avatar in localStorage:', e2);
+      }
     }
+
+    // Reset input value so re-selecting same file triggers onchange
+    if (event.target) event.target.value = '';
 
     // Refresh entire interface
     renderApp();
@@ -3011,14 +2998,14 @@ function openStudentPassModal() {
 
       <!-- Student Profile Info Bar -->
       <div class="py-4 flex items-center gap-4 relative z-10">
-        <div class="relative group cursor-pointer shrink-0" onclick="triggerAvatarUpload()" title="Нажмите, чтобы сменить фото в пропуске">
+        <label for="student-avatar-file-input" class="relative group cursor-pointer shrink-0 block" title="Нажмите, чтобы сменить фото в пропуске">
           <div class="w-20 h-20 rounded-2xl overflow-hidden border-2 border-white/30 shadow-lg flex items-center justify-center bg-white/20 text-white font-extrabold text-2xl relative">
             ${customAvatar ? `<img src="${customAvatar}" alt="${p.name}" class="w-full h-full object-cover" />` : `<span class="user-avatar-initials text-2xl font-bold">${initials}</span>`}
           </div>
           <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-md border-2 border-slate-900">
             <i data-lucide="camera" class="w-3.5 h-3.5"></i>
           </div>
-        </div>
+        </label>
         <div class="min-w-0">
           <div class="text-[11px] font-semibold text-${sec.accent} uppercase tracking-wider mb-0.5">${sec.passType}</div>
           <h3 class="text-base sm:text-lg font-extrabold text-white leading-tight truncate">${p.name}</h3>

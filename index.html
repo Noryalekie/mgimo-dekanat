@@ -273,7 +273,7 @@
 
       <div class="flex flex-col items-center text-center">
         <!-- Interactive Avatar with photo upload trigger -->
-        <div class="relative group cursor-pointer mb-2" onclick="triggerAvatarUpload()" title="Нажмите, чтобы выбрать или сменить фото профиля">
+        <label for="student-avatar-file-input" class="relative group cursor-pointer mb-2 block" title="Нажмите, чтобы выбрать или сменить фото профиля">
           <div class="user-avatar-modal-slot w-20 h-20 rounded-2xl overflow-hidden border-2 border-blue-500/30 shadow-md flex items-center justify-center bg-gradient-to-tr from-blue-600 via-indigo-600 to-blue-700 text-white font-extrabold text-2xl relative">
             <img class="user-avatar-img w-full h-full object-cover hidden" alt="Avatar" />
             <span class="user-avatar-initials text-2xl font-bold">АВ</span>
@@ -285,14 +285,14 @@
           <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-md border-2 border-white dark:border-[#0c0c0e]">
             <i data-lucide="camera" class="w-3.5 h-3.5"></i>
           </div>
-        </div>
+        </label>
 
         <!-- Avatar Actions: Choose / Change / Delete -->
         <div class="flex items-center justify-center gap-3 mb-2 flex-wrap">
-          <button type="button" onclick="triggerAvatarUpload()" class="text-xs text-blue-600 dark:text-blue-400 hover:underline font-semibold flex items-center gap-1.5 transition-all">
+          <label for="student-avatar-file-input" class="text-xs text-blue-600 dark:text-blue-400 hover:underline font-semibold flex items-center gap-1.5 transition-all cursor-pointer">
             <i data-lucide="camera" class="w-3.5 h-3.5"></i>
             <span id="txt-avatar-action">Выбрать фото</span>
-          </button>
+          </label>
           <button id="btn-delete-avatar" type="button" onclick="removeStudentAvatar()" class="text-xs text-rose-500 hover:text-rose-600 hover:underline font-semibold flex items-center gap-1 transition-all hidden">
             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             <span>Удалить фото</span>
@@ -714,16 +714,16 @@
   <!-- Toast Notifications Anchor -->
   <div id="toast-container" class="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-  <!-- Reliable Off-screen File Input for iOS/Desktop Avatar Upload -->
+  <!-- Accessible File Input for Student Avatar Upload -->
   <input
     type="file"
     id="student-avatar-file-input"
     accept="image/*"
-    style="position: fixed; top: -9999px; left: -9999px; opacity: 0; width: 1px; height: 1px; pointer-events: none;"
+    class="sr-only"
     onchange="handleStudentAvatarUpload(event)"
   />
 
   <!-- Core Application Script -->
-  <script src="app.js?v=2.9"></script>
+  <script src="app.js?v=3.0"></script>
 </body>
 </html>
