@@ -1588,7 +1588,7 @@ function renderScheduleScreen(student) {
 
             </div>
           </div>
-        `;
+          `;
         }).join('')}
       </div>
     ` : currentTab === 'week' ? `
@@ -1607,8 +1607,7 @@ function renderScheduleScreen(student) {
               `).join('')}
             </div>
           </div>
-        `;
-        }).join('')}
+        `).join('')}
       </div>
     ` : `
       <!-- Exam Schedule Tab -->
@@ -2005,8 +2004,7 @@ function renderAssistantScreen(student) {
               <div class="text-[10px] mt-2 opacity-60 text-right font-mono">${m.time}</div>
             </div>
           </div>
-        `;
-        }).join('')}
+        `).join('')}
       </div>
 
       <!-- Typing Indicator (hidden by default) -->
