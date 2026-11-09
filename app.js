@@ -634,11 +634,17 @@ document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   setupEventListeners();
   
-  // Clean up any legacy test keys
+  // Clean up any legacy test keys & bad avatar data
   localStorage.removeItem('mgimo_auth_user');
   localStorage.removeItem('mgimo_session');
   localStorage.removeItem('mgimo_profile');
   sessionStorage.removeItem('mgimo_auth_user');
+  ['volkov', 'romanova', 'dubois', 'belova'].forEach(id => {
+    const val = localStorage.getItem('mgimo_custom_avatar_' + id);
+    if (val === 'test_avatar_data' || val === 'null') {
+      localStorage.removeItem('mgimo_custom_avatar_' + id);
+    }
+  });
 
   const rememberedUser = localStorage.getItem('mgimo_remember_user');
   if (rememberedUser && MOCK_DATA[rememberedUser]) {
@@ -695,7 +701,11 @@ function getStudentInitials(fullName = '') {
 }
 
 function getStudentAvatar(studentId) {
-  return localStorage.getItem('mgimo_custom_avatar_' + studentId) || null;
+  const val = localStorage.getItem('mgimo_custom_avatar_' + studentId);
+  if (!val || val === 'test_avatar_data' || val === 'null' || (!val.startsWith('data:image/') && !val.startsWith('http'))) {
+    return null;
+  }
+  return val;
 }
 
 function triggerAvatarUpload() {
@@ -706,19 +716,17 @@ function triggerAvatarUpload() {
   }
 }
 
-// Compress avatar via Canvas down to ~220x220 JPEG (~15-20KB)
-// 100% reliable across iOS Safari, Chrome, and Desktop
-function compressAvatar(file, maxDim = 220, quality = 0.82) {
+// Compress avatar via Canvas down to crisp ~180x180 JPEG (~10-15KB)
+// 100% reliable hardware-accelerated on iOS Safari, Android, and Desktop
+function compressAvatar(file, maxDim = 180, quality = 0.80) {
   return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const dataUrl = e.target.result;
-      const img = new Image();
-      img.onload = function() {
+    // 1. Try native createImageBitmap (iOS 15+, Mac Safari, Chrome)
+    if (typeof createImageBitmap === 'function') {
+      createImageBitmap(file).then(bitmap => {
         try {
           const canvas = document.createElement('canvas');
-          let w = img.width;
-          let h = img.height;
+          let w = bitmap.width;
+          let h = bitmap.height;
           if (w > h) {
             if (w > maxDim) {
               h = Math.round((h * maxDim) / w);
@@ -733,22 +741,54 @@ function compressAvatar(file, maxDim = 220, quality = 0.82) {
           canvas.width = w;
           canvas.height = h;
           const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, w, h);
+          ctx.drawImage(bitmap, 0, 0, w, h);
           resolve(canvas.toDataURL('image/jpeg', quality));
         } catch (_) {
-          resolve(dataUrl);
+          fallbackCompress(file, maxDim, quality, resolve);
         }
-      };
-      img.onerror = function() {
-        resolve(dataUrl);
-      };
-      img.src = dataUrl;
-    };
-    reader.onerror = function() {
-      resolve(null);
-    };
-    reader.readAsDataURL(file);
+      }).catch(() => {
+        fallbackCompress(file, maxDim, quality, resolve);
+      });
+      return;
+    }
+    fallbackCompress(file, maxDim, quality, resolve);
   });
+}
+
+function fallbackCompress(file, maxDim, quality, resolve) {
+  const blobUrl = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = function() {
+    URL.revokeObjectURL(blobUrl);
+    try {
+      const canvas = document.createElement('canvas');
+      let w = img.width;
+      let h = img.height;
+      if (w > h) {
+        if (w > maxDim) {
+          h = Math.round((h * maxDim) / w);
+          w = maxDim;
+        }
+      } else {
+        if (h > maxDim) {
+          w = Math.round((w * maxDim) / h);
+          h = maxDim;
+        }
+      }
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    } catch (_) {
+      resolve(null);
+    }
+  };
+  img.onerror = function() {
+    URL.revokeObjectURL(blobUrl);
+    resolve(null);
+  };
+  img.src = blobUrl;
 }
 
 async function handleStudentAvatarUpload(event) {
@@ -1063,9 +1103,7 @@ function renderOverviewScreen(student) {
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
       <div>
         <div class="flex items-center gap-2 mb-1">
-          <span class="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">Дипломатический портал</span>
-          <span class="text-slate-300 dark:text-slate-700">•</span>
-          <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">${new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+          <span class="text-xs text-slate-500 dark:text-slate-400 font-medium capitalize">${new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
         </div>
         <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           Добрый день, ${p.name.split(' ')[0]} 👋
