@@ -287,9 +287,17 @@
           </div>
         </div>
 
-        <button type="button" onclick="triggerAvatarUpload()" class="text-xs text-blue-600 dark:text-blue-400 hover:underline font-semibold flex items-center gap-1.5 mb-2 transition-all">
-          <i data-lucide="image" class="w-3.5 h-3.5"></i> Выбрать фото профиля
-        </button>
+        <!-- Avatar Actions: Choose / Change / Delete -->
+        <div class="flex items-center justify-center gap-3 mb-2 flex-wrap">
+          <button type="button" onclick="triggerAvatarUpload()" class="text-xs text-blue-600 dark:text-blue-400 hover:underline font-semibold flex items-center gap-1.5 transition-all">
+            <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+            <span id="txt-avatar-action">Выбрать фото</span>
+          </button>
+          <button id="btn-delete-avatar" type="button" onclick="removeStudentAvatar()" class="text-xs text-rose-500 hover:text-rose-600 hover:underline font-semibold flex items-center gap-1 transition-all hidden">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <span>Удалить фото</span>
+          </button>
+        </div>
 
         <h3 class="user-name-full-txt text-lg font-bold text-slate-900 dark:text-white leading-tight">Алексей Волков</h3>
         <p class="user-faculty-full-txt text-xs text-slate-500 dark:text-slate-400 mt-0.5">Факультет МЭО • 4 курс</p>
@@ -706,10 +714,16 @@
   <!-- Toast Notifications Anchor -->
   <div id="toast-container" class="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-  <!-- Hidden Photo File Input for Student Avatar Upload -->
-  <input type="file" id="student-avatar-file-input" accept="image/*" class="hidden" onchange="handleStudentAvatarUpload(event)" />
+  <!-- Reliable Off-screen File Input for iOS/Desktop Avatar Upload -->
+  <input
+    type="file"
+    id="student-avatar-file-input"
+    accept="image/*"
+    style="position: fixed; top: -9999px; left: -9999px; opacity: 0; width: 1px; height: 1px; pointer-events: none;"
+    onchange="handleStudentAvatarUpload(event)"
+  />
 
   <!-- Core Application Script -->
-  <script src="app.js?v=2.5"></script>
+  <script src="app.js?v=2.6"></script>
 </body>
 </html>

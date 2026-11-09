@@ -653,8 +653,6 @@ document.addEventListener('DOMContentLoaded', () => {
     openAuthModal(true);
   }
   initLucide();
-  // Multi-device Cloud Sync
-  syncCloudAvatars();
 });
 
 // Theme Management
@@ -686,9 +684,7 @@ function updateThemeIcons() {
   }
 }
 
-// Avatar & Initials Management & Multi-Device Cloud Sync
-const CLOUD_AVATARS_ENDPOINT = 'https://api.restful-api.dev/objects/ff808181a09d98f701a1c1ca64be7365';
-
+// Avatar & Initials Management
 function getStudentInitials(fullName = '') {
   if (!fullName) return 'СТ';
   const parts = fullName.trim().split(/\s+/);
@@ -702,133 +698,6 @@ function getStudentAvatar(studentId) {
   return localStorage.getItem('mgimo_custom_avatar_' + studentId) || null;
 }
 
-// Multi-device Cloud Sync: Syncs user photos between Mac, iPhone, and jury devices
-async function syncCloudAvatars() {
-  try {
-    const res = await fetch(CLOUD_AVATARS_ENDPOINT);
-    if (!res.ok) return;
-    const json = await res.json();
-    if (json && json.data) {
-      let hasUpdate = false;
-      for (const [studentId, cloudData] of Object.entries(json.data)) {
-        const local = localStorage.getItem('mgimo_custom_avatar_' + studentId);
-        
-        // 1. If cloud has a valid dataUrl and local doesn't have it, pull from cloud:
-        if (cloudData && typeof cloudData === 'string' && cloudData.startsWith('data:image/')) {
-          if (local !== cloudData) {
-            localStorage.setItem('mgimo_custom_avatar_' + studentId, cloudData);
-            hasUpdate = true;
-          }
-        }
-        // 2. If local has a photo but cloud is empty/out of sync, auto-push to cloud:
-        else if (local && typeof local === 'string' && local.startsWith('data:image/')) {
-          pushAvatarToCloud(studentId, local);
-        }
-      }
-      if (hasUpdate) {
-        renderApp();
-      }
-    }
-  } catch (e) {
-    console.warn('Cloud avatar sync offline fallback:', e);
-  }
-}
-
-// Push updated avatar to cloud storage
-async function pushAvatarToCloud(studentId, avatarData) {
-  try {
-    let currentData = { volkov: null, romanova: null, dubois: null, belova: null };
-    try {
-      const getRes = await fetch(CLOUD_AVATARS_ENDPOINT);
-      if (getRes.ok) {
-        const json = await getRes.json();
-        if (json && json.data) currentData = { ...currentData, ...json.data };
-      }
-    } catch (_) {}
-
-    currentData[studentId] = avatarData;
-
-    await fetch(CLOUD_AVATARS_ENDPOINT, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: 'mgimo_cloud_avatars_v1',
-        data: currentData
-      })
-    });
-  } catch (err) {
-    console.warn('Cloud avatar push error:', err);
-  }
-}
-
-// Compress avatar via Canvas down to crisp ~260x260 JPEG (~20-25KB)
-// Bulletproof on iOS Safari (handles HEIC, camera files, quota limits)
-async function compressAvatar(file, maxDim = 260, quality = 0.80) {
-  // 1. Try native createImageBitmap (hardware decoded on iOS 15+)
-  if (typeof createImageBitmap === 'function') {
-    try {
-      const bitmap = await createImageBitmap(file);
-      const canvas = document.createElement('canvas');
-      let { width, height } = bitmap;
-      if (width > height) {
-        if (width > maxDim) {
-          height = Math.round((height * maxDim) / width);
-          width = maxDim;
-        }
-      } else {
-        if (height > maxDim) {
-          width = Math.round((width * maxDim) / height);
-          height = maxDim;
-        }
-      }
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(bitmap, 0, 0, width, height);
-      return canvas.toDataURL('image/jpeg', quality);
-    } catch (e) {
-      console.warn('createImageBitmap fallback to FileReader:', e);
-    }
-  }
-
-  // 2. Standard Canvas + Image fallback
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        try {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-          if (width > height) {
-            if (width > maxDim) {
-              height = Math.round((height * maxDim) / width);
-              width = maxDim;
-            }
-          } else {
-            if (height > maxDim) {
-              width = Math.round((width * maxDim) / height);
-              height = maxDim;
-            }
-          }
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/jpeg', quality));
-        } catch (err) {
-          resolve(e.target.result);
-        }
-      };
-      img.onerror = () => resolve(e.target.result);
-      img.src = e.target.result;
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
 function triggerAvatarUpload() {
   const input = document.getElementById('student-avatar-file-input');
   if (input) {
@@ -837,8 +706,53 @@ function triggerAvatarUpload() {
   }
 }
 
+// Compress avatar via Canvas down to ~220x220 JPEG (~15-20KB)
+// 100% reliable across iOS Safari, Chrome, and Desktop
+function compressAvatar(file, maxDim = 220, quality = 0.82) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const dataUrl = e.target.result;
+      const img = new Image();
+      img.onload = function() {
+        try {
+          const canvas = document.createElement('canvas');
+          let w = img.width;
+          let h = img.height;
+          if (w > h) {
+            if (w > maxDim) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            }
+          } else {
+            if (h > maxDim) {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        } catch (_) {
+          resolve(dataUrl);
+        }
+      };
+      img.onerror = function() {
+        resolve(dataUrl);
+      };
+      img.src = dataUrl;
+    };
+    reader.onerror = function() {
+      resolve(null);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 async function handleStudentAvatarUpload(event) {
-  const file = event.target.files && event.target.files[0];
+  const file = event.target && event.target.files && event.target.files[0];
   if (!file) return;
 
   if (file.size > 15 * 1024 * 1024) {
@@ -846,14 +760,30 @@ async function handleStudentAvatarUpload(event) {
     return;
   }
 
-  showToast('⏳ Сохранение и синхронизация фото...');
+  showToast('⏳ Сохраняем фото профиля...');
 
   try {
     const compressedDataUrl = await compressAvatar(file);
+    if (!compressedDataUrl) {
+      showToast('⚠️ Не удалось прочитать изображение');
+      return;
+    }
+
     const student = getCurrentStudent();
-    
-    // 1. Save locally for instant response
-    localStorage.setItem('mgimo_custom_avatar_' + student.profile.id, compressedDataUrl);
+    const studentId = student.profile.id;
+
+    // Save directly to localStorage
+    try {
+      localStorage.setItem('mgimo_custom_avatar_' + studentId, compressedDataUrl);
+    } catch (storageErr) {
+      console.warn('localStorage set error, retrying:', storageErr);
+      try {
+        localStorage.removeItem('mgimo_custom_avatar_' + studentId);
+        localStorage.setItem('mgimo_custom_avatar_' + studentId, compressedDataUrl);
+      } catch (_) {}
+    }
+
+    // Refresh entire interface
     renderApp();
 
     const profileModal = document.getElementById('modal-profile');
@@ -865,9 +795,7 @@ async function handleStudentAvatarUpload(event) {
       openStudentPassModal();
     }
 
-    // 2. Sync to cloud so other devices (iPhone/Mac/Jury) have it automatically
-    pushAvatarToCloud(student.profile.id, compressedDataUrl);
-    showToast('✓ Фото профиля сохранено и синхронизировано!');
+    showToast('✓ Фото профиля успешно сохранено!');
   } catch (err) {
     console.error('Avatar upload error:', err);
     showToast('⚠️ Ошибка при обработке фото');
@@ -876,14 +804,24 @@ async function handleStudentAvatarUpload(event) {
 
 function removeStudentAvatar() {
   const student = getCurrentStudent();
-  localStorage.removeItem('mgimo_custom_avatar_' + student.profile.id);
-  pushAvatarToCloud(student.profile.id, null);
+  const studentId = student.profile.id;
+
+  // Remove from localStorage
+  localStorage.removeItem('mgimo_custom_avatar_' + studentId);
+
+  // Refresh entire interface
   renderApp();
+
   const profileModal = document.getElementById('modal-profile');
   if (profileModal && !profileModal.classList.contains('hidden')) {
     openProfileModal();
   }
-  showToast('Фото удалено. Установлены инициалы студента.');
+  const passModal = document.getElementById('modal-student-pass');
+  if (passModal && !passModal.classList.contains('hidden')) {
+    openStudentPassModal();
+  }
+
+  showToast('✓ Фото удалено. Установлена стандартная аватарка');
 }
 
 // Current User Helpers
@@ -2371,6 +2309,19 @@ function openProfileModal() {
       } else {
         initialsEl.classList.remove('hidden');
       }
+    }
+
+    const deleteBtn = document.getElementById('btn-delete-avatar');
+    const actionTxt = document.getElementById('txt-avatar-action');
+    if (deleteBtn) {
+      if (customAvatar) {
+        deleteBtn.classList.remove('hidden');
+      } else {
+        deleteBtn.classList.add('hidden');
+      }
+    }
+    if (actionTxt) {
+      actionTxt.textContent = customAvatar ? 'Сменить фото' : 'Выбрать фото';
     }
 
     modal.classList.remove('hidden');
