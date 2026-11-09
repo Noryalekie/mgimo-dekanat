@@ -1,0 +1,208 @@
+/* Vertix & Diplomat Core Custom Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+html, body {
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+/* Hide horizontal scrollbar for clean chip scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+:root {
+  --bg-main-light: #F4F6F9;
+  --bg-main-dark: #000000;
+  --pill-bg-light: rgba(255, 255, 255, 0.85);
+  --pill-bg-dark: rgba(12, 12, 14, 0.88);
+  --card-bg-light: #FFFFFF;
+  --card-bg-dark: #0A0A0C;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Glass & Floating Pill Effects */
+.vertix-glass {
+  background: var(--pill-bg-light);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+}
+
+.dark body {
+  background-color: #000000 !important;
+}
+
+.dark .vertix-glass {
+  background: rgba(12, 12, 14, 0.88) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.7);
+}
+
+.dark .bg-slate-900,
+.dark .bg-slate-950,
+.dark .bg-\[\#101B2B\] {
+  background-color: #0c0c0e !important;
+}
+
+.dark .border-slate-800,
+.dark .border-slate-800\/80,
+.dark .border-slate-800\/60 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Bento Cards */
+.bento-card {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+}
+
+.bento-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -4px rgba(15, 23, 42, 0.08);
+}
+
+.dark .bento-card:hover {
+  box-shadow: 0 14px 34px -4px rgba(0, 0, 0, 0.5);
+}
+
+/* Vertix Signature Gradient Accent Card */
+.accent-card-orange {
+  background: linear-gradient(135deg, #FF6B4A 0%, #FA4D26 50%, #E6350E 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.accent-card-orange::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -20%;
+  width: 140%;
+  height: 140%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.accent-card-diplomat {
+  background: linear-gradient(135deg, #1E3A8A 0%, #1D4ED8 50%, #0284C7 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.accent-card-diplomat::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.6);
+}
+
+/* Animated pulse indicator */
+@keyframes diplomaticPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.7; }
+}
+
+.pulse-badge {
+  animation: diplomaticPulse 2s infinite ease-in-out;
+}
+
+/* Live slider custom thumb */
+input[type=range] {
+  -webkit-appearance: none;
+  background: transparent;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #2563EB;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+  margin-top: -6px;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: #E2E8F0;
+  border-radius: 9999px;
+}
+.dark input[type=range]::-webkit-slider-runnable-track {
+  background: #334155;
+}
+
+/* Official Document Print Mode */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-document, #printable-document * {
+    visibility: visible;
+  }
+  #printable-document {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 20mm;
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Modal Body Scroll Lock (Fixes iOS Safari Background Scroll Bleed & Rubber-Banding) */
+html.modal-open,
+body.modal-open {
+  overflow: hidden !important;
+  height: 100% !important;
+  max-height: 100vh !important;
+  max-height: 100dvh !important;
+  touch-action: none !important;
+  -webkit-overflow-scrolling: auto !important;
+}
+
+/* Modal Scroll Container Containment */
+.modal-scroll-container {
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior: contain !important;
+  overscroll-behavior-y: contain !important;
+}

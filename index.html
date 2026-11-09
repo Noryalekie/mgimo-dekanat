@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ru" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>МГИМО Деканат — Цифровой деканат будущего</title>
+  <meta name="description" content="Концепт цифрового деканата нового поколения для студентов МГИМО МИД России. Vertix Bento Grid стиль.">
+  
+  <!-- Favicon & Apple iOS Touch Icons -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-precomposed.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="МГИМО Деканат">
+  
+  <!-- Tailwind CSS CDN v3 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            mgimo: {
+              navy: '#0A192F',
+              dark: '#081220',
+              card: '#101B2B',
+              blue: '#1E3A8A',
+              azure: '#0284C7',
+              sky: '#38BDF8',
+              gold: '#D97706',
+              amber: '#F59E0B',
+              porcelain: '#F4F6F9',
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css?v=2.2">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+</head>
+<body class="bg-[#F4F6F9] dark:bg-[#000000] text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-300 antialiased selection:bg-blue-600 selection:text-white pb-24 md:pb-8 overflow-x-hidden w-full max-w-[100vw]">
+
+  <!-- ========================================================= -->
+  <!-- FLOATING TOP HEADER (Vertix Style)                         -->
+  <!-- ========================================================= -->
+  <header class="sticky top-0 z-40 px-2.5 sm:px-6 pt-3 pb-2 backdrop-blur-md w-full max-w-full overflow-x-hidden">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-1.5 sm:gap-4 w-full">
+      
+      <!-- 1. Brand Logo Capsule -->
+      <div class="vertix-glass rounded-full px-2.5 sm:px-3.5 py-1.5 border border-slate-200/80 dark:border-slate-800 flex items-center gap-2 cursor-pointer shadow-sm select-none shrink-0" onclick="switchTab('overview')">
+        <!-- Stylized Diplomatic Meridian & Prism Logo SVG -->
+        <div class="relative w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center shrink-0">
+          <div class="absolute inset-0 bg-blue-500/20 rounded-full blur-xs"></div>
+          <svg viewBox="0 0 48 48" fill="none" class="w-full h-full relative z-10 drop-shadow-sm">
+            <circle cx="24" cy="24" r="20" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="3 2" opacity="0.7" />
+            <ellipse cx="24" cy="24" rx="10" ry="20" stroke="#F59E0B" stroke-width="1.5" opacity="0.8" />
+            <line x1="4" y1="24" x2="44" y2="24" stroke="#F59E0B" stroke-width="1" opacity="0.5" />
+            <path d="M24 7L35 18L24 41L13 18L24 7Z" fill="url(#prism-core)" stroke="#38BDF8" stroke-width="1.5" />
+            <path d="M24 7L24 41" stroke="#93C5FD" stroke-width="1" stroke-opacity="0.8" />
+            <path d="M13 18H35" stroke="#93C5FD" stroke-width="1" stroke-opacity="0.8" />
+            <circle cx="24" cy="7" r="2" fill="#F59E0B" />
+            <defs>
+              <linearGradient id="prism-core" x1="13" y1="7" x2="35" y2="41" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#0284C7" />
+                <stop offset="1" stop-color="#0F172A" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+
+        <div class="flex flex-col">
+          <div class="flex items-center gap-1">
+            <span class="font-extrabold text-xs sm:text-sm tracking-tight text-slate-900 dark:text-white">МГИМО</span>
+            <span class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-800 tracking-wider">ДЕКАНАТ</span>
+          </div>
+          <span class="text-[9px] text-slate-500 dark:text-slate-400 font-medium tracking-tight hidden sm:inline">Цифровой деканат будущего</span>
+        </div>
+      </div>
+
+      <!-- 2. Center Main Navigation Capsule (Desktop & Tablets) -->
+      <nav class="hidden lg:flex items-center vertix-glass rounded-full p-1.5 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+        <button onclick="switchTab('overview')" data-nav-tab="overview" class="px-4 py-1.5 rounded-full text-xs font-semibold bg-slate-900 text-white dark:bg-blue-600 shadow-sm transition-all duration-150">
+          Главная
+        </button>
+        <button onclick="switchTab('schedule')" data-nav-tab="schedule" class="px-4 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all duration-150">
+          Расписание
+        </button>
+        <button onclick="switchTab('brs')" data-nav-tab="brs" class="px-4 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all duration-150">
+          БРС и Оценки
+        </button>
+        <button onclick="switchTab('certificates')" data-nav-tab="certificates" class="px-4 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all duration-150">
+          Справки & Заявления
+        </button>
+        <button onclick="switchTab('assistant')" data-nav-tab="assistant" class="px-4 py-1.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all duration-150 flex items-center gap-1">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-500"></i> Tutor AI
+        </button>
+      </nav>
+
+      <!-- 3. Actions & Jury Persona Profile Capsule -->
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        
+        <!-- Theme Toggle Pill (Visible on ALL devices, including mobile) -->
+        <button onclick="toggleTheme()" class="vertix-glass rounded-full p-2 sm:p-2.5 border border-slate-200/80 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 transition-all text-amber-500 dark:text-amber-400 shadow-sm flex items-center justify-center cursor-pointer shrink-0" title="Переключить тему">
+          <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-amber-400"></i>
+          <i data-lucide="moon" class="w-4 h-4 block dark:hidden text-slate-700"></i>
+        </button>
+
+        <!-- Notification Pill -->
+        <button onclick="switchTab('notifications')" class="vertix-glass rounded-full p-2 sm:p-2.5 border border-slate-200/80 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 transition-all relative text-slate-700 dark:text-slate-300 shadow-sm shrink-0" title="Уведомления деканата">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+          <span class="notif-badge absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center ring-2 ring-white dark:ring-slate-900 hidden">2</span>
+        </button>
+
+        <!-- Digital ID Pass Pill -->
+        <button onclick="openStudentPassModal()" class="vertix-glass rounded-full p-2.5 border border-slate-200/80 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 transition-all text-slate-700 dark:text-slate-300 shadow-sm hidden sm:flex shrink-0" title="Цифровой пропуск МГИМО">
+          <i data-lucide="qr-code" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Student Profile Capsule -->
+        <div onclick="openProfileModal()" class="vertix-glass rounded-full p-1 pl-1.5 pr-2.5 sm:pr-3.5 border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-sm transition-all select-none shrink-0 max-w-[135px] sm:max-w-none">
+          <div class="user-avatar-slot w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 flex items-center justify-center bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-[10px] sm:text-xs shadow-sm">
+            <img alt="Avatar" class="user-avatar-img w-full h-full object-cover hidden" />
+            <span class="user-avatar-initials text-[10px] sm:text-[11px]">АВ</span>
+          </div>
+          <div class="flex flex-col text-left min-w-0 overflow-hidden">
+            <span class="user-name-txt text-[11px] sm:text-xs font-bold text-slate-900 dark:text-white leading-tight truncate">Алексей</span>
+            <span class="user-faculty-txt text-[9px] text-slate-500 dark:text-slate-400 leading-none hidden sm:inline truncate">МЭО • 4 курс</span>
+          </div>
+          <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400 shrink-0"></i>
+        </div>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ========================================================= -->
+  <!-- MAIN WORKSPACE LAYOUT: LEFT RAIL + CONTENT CANVAS        -->
+  <!-- ========================================================= -->
+  <div class="max-w-7xl mx-auto px-3 sm:px-6 pt-2 pb-12 flex gap-6 w-full max-w-full overflow-x-hidden">
+    
+    <!-- LEFT FLOATING PILL RAIL (Desktop >= 1024px) -->
+    <aside class="hidden lg:flex flex-col gap-3 sticky top-20 self-start shrink-0">
+      
+      <!-- Top Mini Capsule: Theme Switcher -->
+      <div class="vertix-glass rounded-full p-1 border border-slate-200/80 dark:border-slate-800 flex flex-col items-center gap-1 shadow-sm">
+        <button onclick="toggleTheme()" class="theme-btn-sun w-8 h-8 rounded-full flex items-center justify-center transition-all text-amber-500 bg-white shadow-sm" title="Светлая тема">
+          <i data-lucide="sun" class="w-4 h-4"></i>
+        </button>
+        <button onclick="toggleTheme()" class="theme-btn-moon w-8 h-8 rounded-full flex items-center justify-center transition-all text-slate-400 hover:text-slate-200" title="Темная тема">
+          <i data-lucide="moon" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Center Tall Capsule: Navigation Icons -->
+      <div class="vertix-glass rounded-full p-1.5 border border-slate-200/80 dark:border-slate-800 flex flex-col items-center gap-2 shadow-sm">
+        <button onclick="switchTab('overview')" data-rail-tab="overview" class="w-10 h-10 rounded-full bg-slate-900 text-white dark:bg-blue-600 flex items-center justify-center transition-all shadow-sm" title="Главный дашборд">
+          <i data-lucide="layout-grid" class="w-4 h-4"></i>
+        </button>
+        <button onclick="switchTab('schedule')" data-rail-tab="schedule" class="w-10 h-10 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-all" title="Расписание пар">
+          <i data-lucide="calendar" class="w-4 h-4"></i>
+        </button>
+        <button onclick="switchTab('brs')" data-rail-tab="brs" class="w-10 h-10 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-all" title="Рейтинг БРС и радар рисков">
+          <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+        </button>
+        <button onclick="switchTab('certificates')" data-rail-tab="certificates" class="w-10 h-10 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-all" title="Заказ справок с QR">
+          <i data-lucide="file-text" class="w-4 h-4"></i>
+        </button>
+        <button onclick="switchTab('assistant')" data-rail-tab="assistant" class="w-10 h-10 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-all" title="Tutor AI советник деканата">
+          <i data-lucide="sparkles" class="w-4 h-4 text-blue-500"></i>
+        </button>
+        <button onclick="switchTab('notifications')" data-rail-tab="notifications" class="w-10 h-10 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-all" title="Уведомления">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Bottom Mini Capsule: ID Pass & Login/Logout -->
+      <div class="vertix-glass rounded-full p-1.5 border border-slate-200/80 dark:border-slate-800 flex flex-col items-center gap-1 shadow-sm">
+        <button onclick="openStudentPassModal()" class="w-9 h-9 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-all" title="Пропуск МГИМО">
+          <i data-lucide="id-card" class="w-4 h-4"></i>
+        </button>
+        <button onclick="openAuthModal()" class="w-9 h-9 rounded-full text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-all" title="Сменить пользователя / Войти">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- CONTENT CANVAS (Scrollable screens) -->
+    <main class="flex-1 w-full min-w-0">
+      
+      <!-- Screen 1: Dashboard Overview -->
+      <section id="screen-overview" class="w-full"></section>
+
+      <!-- Screen 2: Schedule -->
+      <section id="screen-schedule" class="w-full hidden"></section>
+
+      <!-- Screen 3: BRS & Grades -->
+      <section id="screen-brs" class="w-full hidden"></section>
+
+      <!-- Screen 4: Certificates & Requests -->
+      <section id="screen-certificates" class="w-full hidden"></section>
+
+      <!-- Screen 5: AI Assistant -->
+      <section id="screen-assistant" class="w-full hidden"></section>
+
+      <!-- Screen 6: Notifications -->
+      <section id="screen-notifications" class="w-full hidden"></section>
+
+      <!-- ========================================================= -->
+      <!-- MANDATORY HACKATHON DISCLAIMER FOOTER                     -->
+      <!-- ========================================================= -->
+      <footer class="mt-12 pt-6 pb-6 text-center select-none text-[11px] text-slate-400 dark:text-slate-600">
+        МГИМО • Цифровой деканат студента
+      </footer>
+
+    </main>
+
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MOBILE BOTTOM FLOATING TAB BAR (Fixed on < 1024px)        -->
+  <!-- ========================================================= -->
+  <div class="lg:hidden fixed bottom-3 inset-x-3 z-40">
+    <div class="vertix-glass rounded-full px-4 py-2 border border-slate-200/90 dark:border-slate-800 flex items-center justify-between shadow-xl max-w-md mx-auto">
+      <button onclick="switchTab('overview')" data-mobile-tab="overview" class="flex flex-col items-center gap-0.5 text-blue-600 dark:text-blue-400 font-semibold text-[10px]">
+        <i data-lucide="layout-grid" class="w-5 h-5"></i>
+        <span>Главная</span>
+      </button>
+      <button onclick="switchTab('schedule')" data-mobile-tab="schedule" class="flex flex-col items-center gap-0.5 text-slate-400 dark:text-slate-500 text-[10px]">
+        <i data-lucide="calendar" class="w-5 h-5"></i>
+        <span>Пары</span>
+      </button>
+      <button onclick="switchTab('brs')" data-mobile-tab="brs" class="flex flex-col items-center gap-0.5 text-slate-400 dark:text-slate-500 text-[10px]">
+        <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+        <span>БРС</span>
+      </button>
+      <button onclick="switchTab('certificates')" data-mobile-tab="certificates" class="flex flex-col items-center gap-0.5 text-slate-400 dark:text-slate-500 text-[10px]">
+        <i data-lucide="file-text" class="w-5 h-5"></i>
+        <span>Справки</span>
+      </button>
+      <button onclick="switchTab('assistant')" data-mobile-tab="assistant" class="flex flex-col items-center gap-0.5 text-slate-400 dark:text-slate-500 text-[10px]">
+        <i data-lucide="sparkles" class="w-5 h-5 text-blue-500"></i>
+        <span>Tutor AI</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL: STUDENT PROFILE & SESSION MANAGEMENT               -->
+  <!-- ========================================================= -->
+  <div id="modal-profile" onclick="if(event.target === this) closeAllModals()" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-md hidden overflow-y-auto overscroll-contain modal-scroll-container">
+    <div class="bg-white dark:bg-[#0c0c0e] border border-slate-200 dark:border-white/10 rounded-3xl p-6 sm:p-7 max-w-sm w-full shadow-2xl relative my-auto max-h-[92vh] max-h-[92dvh] overflow-y-auto overscroll-contain">
+      <button type="button" onclick="closeAllModals()" class="absolute top-4 right-4 z-30 w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100/90 dark:bg-white/10 hover:bg-slate-200 transition-all cursor-pointer shadow-sm" title="Закрыть">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="flex flex-col items-center text-center">
+        <!-- Interactive Avatar with photo upload trigger -->
+        <div class="relative group cursor-pointer mb-2" onclick="triggerAvatarUpload()" title="Нажмите, чтобы выбрать или сменить фото профиля">
+          <div class="user-avatar-modal-slot w-20 h-20 rounded-2xl overflow-hidden border-2 border-blue-500/30 shadow-md flex items-center justify-center bg-gradient-to-tr from-blue-600 via-indigo-600 to-blue-700 text-white font-extrabold text-2xl relative">
+            <img class="user-avatar-img w-full h-full object-cover hidden" alt="Avatar" />
+            <span class="user-avatar-initials text-2xl font-bold">АВ</span>
+          </div>
+          <div class="absolute inset-0 bg-slate-950/50 rounded-2xl flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-[10px] font-semibold">
+            <i data-lucide="camera" class="w-5 h-5 mb-0.5"></i>
+            <span>Сменить фото</span>
+          </div>
+          <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-md border-2 border-white dark:border-[#0c0c0e]">
+            <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+          </div>
+        </div>
+
+        <button type="button" onclick="triggerAvatarUpload()" class="text-xs text-blue-600 dark:text-blue-400 hover:underline font-semibold flex items-center gap-1.5 mb-2 transition-all">
+          <i data-lucide="image" class="w-3.5 h-3.5"></i> Выбрать фото профиля
+        </button>
+
+        <h3 class="user-name-full-txt text-lg font-bold text-slate-900 dark:text-white leading-tight">Алексей Волков</h3>
+        <p class="user-faculty-full-txt text-xs text-slate-500 dark:text-slate-400 mt-0.5">Факультет МЭО • 4 курс</p>
+        <span class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold border border-emerald-200 dark:border-emerald-800">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Студент очной формы
+        </span>
+      </div>
+
+      <div class="mt-5 space-y-2 text-xs">
+        <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60">
+          <span class="text-slate-500">Студенческий билет:</span>
+          <span class="user-id-txt font-mono font-bold text-slate-900 dark:text-white">МЭО-2022-0481</span>
+        </div>
+        <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60">
+          <span class="text-slate-500">Форма обучения:</span>
+          <span class="font-medium text-slate-900 dark:text-white">Бюджетная (очная)</span>
+        </div>
+      </div>
+
+      <div class="mt-6 flex flex-col gap-2">
+        <button onclick="openStudentPassModal()" class="w-full py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold flex items-center justify-center gap-2 transition-all">
+          <i data-lucide="id-card" class="w-4 h-4 text-blue-500"></i> Электронный пропуск
+        </button>
+        <button onclick="logoutUser()" class="w-full py-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/80 text-xs font-bold flex items-center justify-center gap-2 transition-all">
+          <i data-lucide="log-out" class="w-4 h-4"></i> Выйти из системы
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL: LOGIN / AUTHENTICATION                             -->
+  <!-- ========================================================= -->
+  <div id="modal-auth" onclick="if(event.target === this && window.isUserAuthenticated()) closeAllModals()" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden overflow-y-auto overscroll-contain modal-scroll-container">
+    <div class="bg-white dark:bg-[#0c0c0e] border border-slate-200 dark:border-white/10 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative animate-fadeIn my-auto max-h-[92vh] max-h-[92dvh] overflow-y-auto overscroll-contain">
+      <button id="auth-close-btn" type="button" onclick="closeAllModals()" class="absolute top-4 right-4 z-30 w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100/90 dark:bg-white/10 hover:bg-slate-200 transition-all cursor-pointer shadow-sm" title="Закрыть">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/25">
+          <i data-lucide="shield-check" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">Вход в Личный кабинет</h3>
+          <p class="text-[11px] text-slate-400">Цифровой деканат МГИМО МИД России</p>
+        </div>
+      </div>
+
+      <!-- Inline validation error alert -->
+      <div id="auth-error-msg" class="hidden my-3 p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-xs text-rose-600 dark:text-rose-300 flex items-center gap-2 animate-fadeIn">
+        <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 text-rose-500"></i>
+        <span id="auth-error-text">Неверный пароль</span>
+      </div>
+
+      <form onsubmit="handleCustomLogin(event)" class="space-y-3.5 mt-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Корпоративный Email или Логин</label>
+          <input
+            id="auth-email-input"
+            type="text"
+            required
+            value=""
+            placeholder="student@my.mgimo.ru"
+            class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Пароль от кабинета</label>
+          <div class="relative">
+            <input
+              id="auth-password-input"
+              type="password"
+              required
+              value=""
+              placeholder="••••••••"
+              class="w-full px-4 py-2.5 pr-10 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono transition-all"
+            />
+            <button
+              type="button"
+              onclick="togglePasswordMask()"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
+              title="Показать/скрыть пароль"
+            >
+              <i id="auth-eye-icon" data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember Me Checkbox & Forgot Password -->
+        <div class="flex items-center justify-between text-xs pt-1 select-none">
+          <label class="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+            <input
+              id="auth-remember-me"
+              type="checkbox"
+              class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300 dark:border-slate-700 dark:bg-slate-800"
+            />
+            <span>Запомнить меня на устройстве</span>
+          </label>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-bold shadow-lg shadow-blue-500/25 transition-all active:scale-[0.98] mt-2 flex items-center justify-center gap-2"
+        >
+          <i data-lucide="log-in" class="w-4 h-4"></i> Войти в личный кабинет
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL: ORDER NEW CERTIFICATE FORM                         -->
+  <!-- ========================================================= -->
+  <div id="modal-order-cert" onclick="if(event.target === this) closeAllModals()" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-md hidden overflow-y-auto overscroll-contain modal-scroll-container">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-7 max-w-lg w-full shadow-2xl relative my-auto max-h-[92vh] max-h-[92dvh] overflow-y-auto overscroll-contain">
+      <button type="button" onclick="closeAllModals()" class="absolute top-4 right-4 z-30 w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100/90 dark:bg-white/10 hover:bg-slate-200 transition-all cursor-pointer shadow-sm" title="Закрыть">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="flex items-center gap-2 mb-1">
+        <div class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+          <i data-lucide="file-plus" class="w-4 h-4"></i>
+        </div>
+        <h3 class="text-lg font-extrabold text-slate-900 dark:text-white">
+          Заказ справки онлайн
+        </h3>
+      </div>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-5">
+        Электронный деканат сформирует документ с гербовой ЭЦП и защитным QR-кодом для проверки.
+      </p>
+
+      <form onsubmit="handleCreateCertificateSubmit(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Вид запрашиваемого документа</label>
+          <select
+            id="order-doc-type"
+            class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="Справка об обучении с гербовой ЭЦП">Справка об обучении (по месту требования / посольство)</option>
+            <option value="Выписка из экзаменационной ведомости (Transcript)">Academic Transcript с оценками (на русском/английском)</option>
+            <option value="Справка в военный комиссариат (Приложение 2)">Справка для военкомата (Приложение №2)</option>
+            <option value="Визовое ходатайство (Visa Extension Letter)">Ходатайство в МВД для продления учебной визы</option>
+            <option value="Заявление декану на академический отпуск">Заявление на имя декана факультета</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Орган / учреждение предоставления (Цель)</label>
+          <input
+            id="order-doc-purpose"
+            type="text"
+            required
+            placeholder="Например: Посольство Французской Республики в РФ"
+            value="По месту требования"
+            class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Язык бланка</label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
+              <input type="radio" name="order-lang" value="ru" checked class="text-blue-600" />
+              <span class="text-xs font-medium">Русский язык</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
+              <input type="radio" name="order-lang" value="en" class="text-blue-600" />
+              <span class="text-xs font-medium">English (Diplomatic)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-slate-900 dark:text-white">Срочное изготовление</div>
+            <div class="text-[11px] text-slate-400">Готовность в день подачи (до 18:00)</div>
+          </div>
+          <input id="order-doc-urgent" type="checkbox" class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500" />
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-3">
+          <button type="button" onclick="closeAllModals()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white">
+            Отмена
+          </button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md shadow-blue-500/20 transition-all">
+            Отправить в канцелярию
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL: REALISTIC PRINTABLE CERTIFICATE PREVIEW            -->
+  <!-- ========================================================= -->
+  <div id="modal-preview-cert" onclick="if(event.target === this) closeAllModals()" class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-slate-950/85 backdrop-blur-md hidden overflow-y-auto overscroll-contain modal-scroll-container">
+    <div class="w-full max-w-4xl bg-slate-100 dark:bg-slate-900 rounded-3xl p-4 sm:p-6 shadow-2xl relative my-auto max-h-[94vh] max-h-[94dvh] flex flex-col overscroll-contain">
+      
+      <!-- Modal Top Action Bar -->
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <span class="text-xs font-bold text-slate-900 dark:text-white">Электронный образ официального документа</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="printDocument()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="printer" class="w-4 h-4"></i> Распечатать / PDF
+          </button>
+          <button onclick="closeAllModals()" class="w-10 h-10 rounded-full bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-white flex items-center justify-center hover:bg-slate-300 dark:hover:bg-white/20 transition-all cursor-pointer shadow-sm" title="Закрыть">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Container -->
+      <div id="preview-cert-printable-content" class="overflow-y-auto max-h-[75vh]"></div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL: LIVE BRS CALCULATOR                                -->
+  <!-- ========================================================= -->
+  <div id="modal-brs-calc" onclick="if(event.target === this) closeAllModals()" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-md hidden overflow-y-auto overscroll-contain modal-scroll-container">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-7 max-w-lg w-full shadow-2xl relative my-auto max-h-[92vh] max-h-[92dvh] overflow-y-auto overscroll-contain">
+      <button type="button" onclick="closeAllModals()" class="absolute top-4 right-4 z-30 w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100/90 dark:bg-white/10 hover:bg-slate-200 transition-all cursor-pointer shadow-sm" title="Закрыть">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="flex items-center gap-2 mb-1">
+        <div class="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+          <i data-lucide="calculator" class="w-4 h-4"></i>
+        </div>
+        <h3 class="text-lg font-extrabold text-slate-900 dark:text-white">
+          Калькулятор БРС: Сколько до автомата?
+        </h3>
+      </div>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-5">
+        Двигайте интерактивные ползунки для расчета прогноза оценки по регламенту МГИМО.
+      </p>
+
+      <!-- Interactive Sliders -->
+      <div class="space-y-4">
+        <div>
+          <div class="flex justify-between text-xs font-semibold mb-1">
+            <span>Работа на семинарах (макс. 30)</span>
+            <span id="calc-sem-val" class="font-mono text-blue-600 dark:text-blue-400 font-bold">25 б.</span>
+          </div>
+          <input id="calc-seminars-slider" type="range" min="0" max="30" value="25" oninput="recalculateBrsLive()" class="w-full" />
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs font-semibold mb-1">
+            <span>Контрольные / Коллоквиумы (макс. 30)</span>
+            <span id="calc-test-val" class="font-mono text-blue-600 dark:text-blue-400 font-bold">25 б.</span>
+          </div>
+          <input id="calc-tests-slider" type="range" min="0" max="30" value="25" oninput="recalculateBrsLive()" class="w-full" />
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs font-semibold mb-1">
+            <span>Посещаемость и активность (макс. 10)</span>
+            <span id="calc-att-val" class="font-mono text-blue-600 dark:text-blue-400 font-bold">10 б.</span>
+          </div>
+          <input id="calc-att-slider" type="range" min="0" max="10" value="10" oninput="recalculateBrsLive()" class="w-full" />
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs font-semibold mb-1">
+            <span>Оценка на экзамене / зачете (макс. 30)</span>
+            <span id="calc-exam-val" class="font-mono text-blue-600 dark:text-blue-400 font-bold">25 б.</span>
+          </div>
+          <input id="calc-exam-slider" type="range" min="0" max="30" value="25" oninput="recalculateBrsLive()" class="w-full" />
+        </div>
+      </div>
+
+      <!-- Result Card -->
+      <div class="mt-6 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-xs uppercase font-bold text-slate-400">Итоговый балл</div>
+            <div id="calc-total-result" class="text-4xl font-extrabold text-blue-600">85</div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs uppercase font-bold text-slate-400">Оценка ECTS</div>
+            <div id="calc-grade-result" class="text-sm font-bold text-slate-900 dark:text-white">B (Хорошо)</div>
+          </div>
+        </div>
+        <p id="calc-advice-result" class="text-xs text-slate-600 dark:text-slate-300 mt-3 pt-3 border-t border-slate-200/50 dark:border-slate-700/50 leading-relaxed"></p>
+      </div>
+
+      <div class="mt-5 text-right">
+        <button onclick="closeAllModals()" class="px-5 py-2 rounded-xl bg-slate-900 text-white dark:bg-blue-600 text-xs font-bold transition-all">
+          Готово
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL: DIGITAL STUDENT PASS (NFC/QR)                      -->
+  <!-- ========================================================= -->
+  <div id="modal-student-pass" onclick="if(event.target === this) closeAllModals()" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md hidden overflow-y-auto overscroll-contain modal-scroll-container">
+    <div class="max-w-md w-full relative my-auto max-h-[94vh] max-h-[94dvh] overflow-y-auto overscroll-contain">
+      <div id="student-pass-card-content"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL: CAMPUS ROUTE / NAVIGATION                         -->
+  <!-- ========================================================= -->
+  <div id="modal-campus-route" onclick="if(event.target === this) closeAllModals()" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-md hidden overflow-y-auto overscroll-contain modal-scroll-container">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-6 max-w-md w-full shadow-2xl relative my-auto max-h-[92vh] max-h-[92dvh] overflow-y-auto overscroll-contain">
+      <button type="button" onclick="closeAllModals()" class="absolute top-4 right-4 z-30 w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100/90 dark:bg-white/10 hover:bg-slate-200 transition-all cursor-pointer shadow-sm" title="Закрыть">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center">
+          <i data-lucide="map-pin" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Навигатор по кампусу МГИМО</h3>
+          <p class="text-[11px] text-slate-400">Проспект Вернадского, 76</p>
+        </div>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/80 mb-4">
+        <div class="text-xs uppercase font-bold text-blue-700 dark:text-blue-300">Целевая точка:</div>
+        <div id="route-room-title" class="text-lg font-extrabold text-blue-900 dark:text-blue-100">Ауд. 3144</div>
+        <p id="route-room-desc" class="text-xs text-blue-800 dark:text-blue-200 mt-2 leading-relaxed">
+          Новый корпус, 3 этаж, скоростной лифт Б.
+        </p>
+      </div>
+
+      <div class="text-xs text-slate-500 space-y-1.5 mb-5">
+        <div class="flex items-center gap-1.5">
+          <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span>Время пешком от центрального входа: ~3 минуты</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <i data-lucide="accessibility" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span>Доступна безбарьерная среда (Лифт А и Б)</span>
+        </div>
+      </div>
+
+      <button onclick="closeAllModals()" class="w-full py-2.5 rounded-xl bg-slate-900 text-white dark:bg-blue-600 text-xs font-bold">
+        Понятно, иду на пару
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL: ECTS CREDITS EXPLANATION                           -->
+  <!-- ========================================================= -->
+  <div id="modal-ects-info" onclick="if(event.target === this) closeAllModals()" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-md hidden overflow-y-auto overscroll-contain modal-scroll-container">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-7 max-w-lg w-full shadow-2xl relative my-auto max-h-[92vh] max-h-[92dvh] overflow-y-auto overscroll-contain animate-fadeIn">
+      <button type="button" onclick="closeAllModals()" class="absolute top-4 right-4 z-30 w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100/90 dark:bg-white/10 hover:bg-slate-200 transition-all cursor-pointer shadow-sm" title="Закрыть">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="flex items-center gap-2.5 mb-2">
+        <div class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
+          <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">Что такое ECTS кредиты?</h3>
+          <p class="text-[11px] text-slate-400">Зачётные единицы трудоёмкости (з.е.) в МГИМО</p>
+        </div>
+      </div>
+
+      <div class="mt-4 space-y-3.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+        <div class="p-3.5 rounded-2xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200/60 dark:border-blue-800/60 flex items-start gap-3">
+          <span class="text-xl">🎓</span>
+          <div>
+            <strong class="text-slate-900 dark:text-white block font-semibold mb-0.5">Единая шкала высшего образования</strong>
+            <span><strong>ECTS</strong> (European Credit Transfer and Accumulation System) — это общепринятая мера учебной нагрузки. В официальных документах вузов РФ они называются <strong>зачётными единицами (з.е.)</strong>.</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+            <span class="text-slate-400 block text-[10px] uppercase font-bold">1 ECTS Кредит равен</span>
+            <span class="text-base font-extrabold text-blue-600 dark:text-blue-400 font-mono">36 часам</span>
+            <span class="text-slate-500 block text-[11px] mt-0.5">Лекции, семинары, подготовка и экзамен</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+            <span class="text-slate-400 block text-[10px] uppercase font-bold">Норма для диплома</span>
+            <span class="text-base font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">240 з.е.</span>
+            <span class="text-slate-500 block text-[11px] mt-0.5">Бакалавриат (4 года по 60 з.е. в год)</span>
+          </div>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-2">
+          <div class="font-bold text-xs text-slate-900 dark:text-white flex items-center gap-1.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i>
+            Зачем это нужно студенту:
+          </div>
+          <ul class="space-y-1.5 text-xs text-slate-600 dark:text-slate-400 pl-4 list-disc">
+            <li><strong>Прогресс к выпуску</strong>: шкала наглядно показывает, сколько обязательных предметов и практик вы уже закрыли.</li>
+            <li><strong>Международное признание</strong>: по системе ECTS оформляется официальное приложение к диплому (<em>Diploma Supplement</em>) для стажировок в системе МИД РФ, институтах ООН и зарубежных вузах.</li>
+          </ul>
+        </div>
+      </div>
+
+      <button type="button" onclick="closeAllModals()" class="w-full mt-5 py-2.5 rounded-xl bg-slate-900 text-white dark:bg-blue-600 text-xs font-bold transition-all">
+        Понятно, спасибо
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Notifications Anchor -->
+  <div id="toast-container" class="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Hidden Photo File Input for Student Avatar Upload -->
+  <input type="file" id="student-avatar-file-input" accept="image/*" class="hidden" onchange="handleStudentAvatarUpload(event)" />
+
+  <!-- Core Application Script -->
+  <script src="app.js?v=2.2"></script>
+</body>
+</html>
