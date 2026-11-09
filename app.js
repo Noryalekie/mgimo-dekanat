@@ -1005,6 +1005,62 @@ function renderApp() {
   initLucide();
 }
 
+// Dynamic Real-Time Class Status Helper (calculates real-world class status by current time)
+function getDynamicClassStatus(classes = []) {
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const parsed = classes.map(c => {
+    const parts = (c.time || '').split(/[—–-]/).map(s => s.trim());
+    let startMin = 0, endMin = 0;
+    if (parts.length >= 2) {
+      const [sh, sm] = parts[0].split(':').map(Number);
+      const [eh, em] = parts[1].split(':').map(Number);
+      startMin = (sh || 0) * 60 + (sm || 0);
+      endMin = (eh || 0) * 60 + (em || 0);
+    }
+    return { ...c, startMin, endMin };
+  });
+
+  // 1. Is any class in progress right now?
+  const live = parsed.find(c => currentMinutes >= c.startMin && currentMinutes <= c.endMin);
+  if (live) {
+    return {
+      status: 'live',
+      badgeText: 'Идет сейчас',
+      badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800',
+      dotClass: 'bg-emerald-500 pulse-badge',
+      item: live,
+      headerTitle: 'Текущая пара'
+    };
+  }
+
+  // 2. Is there an upcoming class today?
+  const upcoming = parsed.find(c => currentMinutes < c.startMin);
+  if (upcoming) {
+    const diff = upcoming.startMin - currentMinutes;
+    const timeText = diff <= 60 ? `через ${diff} мин` : `в ${upcoming.time.split(/[—–-]/)[0].trim()}`;
+    return {
+      status: 'upcoming',
+      badgeText: `Начнется ${timeText}`,
+      badgeClass: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800',
+      dotClass: 'bg-blue-500',
+      item: upcoming,
+      headerTitle: 'Следующая пара'
+    };
+  }
+
+  // 3. If past all classes for today (e.g. evening / night):
+  return {
+    status: 'finished',
+    badgeText: 'Пары окончены',
+    badgeClass: 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
+    dotClass: 'bg-slate-400',
+    item: classes[0] || null,
+    headerTitle: 'Учебный день'
+  };
+}
+
 // ==========================================
 // 1. SCREEN: OVERVIEW (Главный Дашборд)
 // ==========================================
@@ -1013,7 +1069,8 @@ function renderOverviewScreen(student) {
   const screen = document.getElementById('screen-overview');
   if (!screen) return;
 
-  const liveClass = student.todaySchedule.find(c => c.isLive) || student.todaySchedule[0];
+  const schedStatus = getDynamicClassStatus(student.todaySchedule);
+  const targetClass = schedStatus.item;
   const activeCert = student.certificates[0];
 
   // Signature Accent Card theme: Alexey gets Royal Blue / Amber Honors card, Sofia gets Attention Rose / Amber, Dubois gets Sapphire International
@@ -1145,32 +1202,48 @@ function renderOverviewScreen(student) {
       <div class="md:col-span-6 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-7 bento-card flex flex-col justify-between h-full min-h-[260px]">
         <div>
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Ближайшая пара</span>
-            ${liveClass ? `
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${liveClass.isLive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'}">
-                <span class="w-2 h-2 rounded-full ${liveClass.isLive ? 'bg-emerald-500 pulse-badge' : 'bg-slate-400'}"></span>
-                ${liveClass.statusBadge || 'Следующая'}
-              </span>
-            ` : ''}
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">${schedStatus.headerTitle}</span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border ${schedStatus.badgeClass}">
+              <span class="w-2 h-2 rounded-full ${schedStatus.dotClass}"></span>
+              ${schedStatus.badgeText}
+            </span>
           </div>
 
-          ${liveClass ? `
-            <div class="text-sm font-semibold text-blue-600 dark:text-blue-400 font-mono mb-1">
-              ${liveClass.time} • Пара ${liveClass.pairNumber}
+          ${schedStatus.status === 'finished' ? `
+            <div class="text-sm font-semibold text-slate-500 dark:text-slate-400 font-mono mb-1">
+              Занятия на сегодня завершены
             </div>
             <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug">
-              ${liveClass.subject}
+              Все запланированные пары прошли
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5">
+              <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-500"></i>
+              Следующее занятие: Завтра в 09:00 • Ауд. 3144
+            </p>
+            <div class="mt-3.5 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+              <div class="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                <span>Учебный день закрыт</span>
+              </div>
+              <button onclick="switchTab('schedule')" class="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline">Расписание на завтра →</button>
+            </div>
+          ` : targetClass ? `
+            <div class="text-sm font-semibold text-blue-600 dark:text-blue-400 font-mono mb-1">
+              ${targetClass.time} • Пара ${targetClass.pairNumber}
+            </div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug">
+              ${targetClass.subject}
             </h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5">
               <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
-              ${liveClass.teacher}
+              ${targetClass.teacher}
             </p>
             <div class="mt-3.5 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
               <div class="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300">
                 <i data-lucide="map-pin" class="w-4 h-4 text-blue-500 shrink-0"></i>
-                <span class="font-semibold">${liveClass.auditorium}</span>
+                <span class="font-semibold">${targetClass.auditorium}</span>
               </div>
-              <span class="text-[11px] text-slate-400">${liveClass.building}</span>
+              <span class="text-[11px] text-slate-400">${targetClass.building}</span>
             </div>
           ` : `
             <div class="py-6 text-center text-slate-400 text-sm">Сегодня больше пар нет</div>
@@ -1178,7 +1251,7 @@ function renderOverviewScreen(student) {
         </div>
 
         <div class="pt-4 mt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <button onclick="openCampusRouteModal('${liveClass ? liveClass.auditorium : 'Зал №1'}')" class="text-xs font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1.5 hover:underline">
+          <button onclick="openCampusRouteModal('${targetClass ? targetClass.auditorium : 'Зал №1'}')" class="text-xs font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1.5 hover:underline">
             <i data-lucide="navigation" class="w-3.5 h-3.5"></i> Как пройти
           </button>
           <button onclick="switchTab('schedule')" class="text-xs font-medium text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center gap-1">
@@ -1445,13 +1518,32 @@ function renderScheduleScreen(student) {
     <!-- Content based on current Schedule Tab -->
     ${currentTab === 'today' ? `
       <div class="space-y-4">
-        ${filteredToday.map(c => `
-          <div class="bg-white dark:bg-slate-900 border ${c.isLive ? 'border-emerald-400 dark:border-emerald-600 shadow-emerald-500/10 ring-2 ring-emerald-500/20' : 'border-slate-200/80 dark:border-slate-800'} rounded-3xl p-5 sm:p-6 bento-card relative">
+        ${filteredToday.map(c => {
+          const now = new Date();
+          const curMin = now.getHours() * 60 + now.getMinutes();
+          const parts = (c.time || '').split(/[—–-]/).map(s => s.trim());
+          let startMin = 0, endMin = 0;
+          if (parts.length >= 2) {
+            const [sh, sm] = parts[0].split(':').map(Number);
+            const [eh, em] = parts[1].split(':').map(Number);
+            startMin = (sh || 0) * 60 + (sm || 0);
+            endMin = (eh || 0) * 60 + (em || 0);
+          }
+          const isCurrentlyLive = curMin >= startMin && curMin <= endMin;
+          const isPassed = curMin > endMin;
+          let badgeText = c.statusBadge;
+          if (badgeText === 'Идет сейчас' && !isCurrentlyLive) {
+            badgeText = isPassed ? 'Завершена' : '';
+          }
+          const isLiveStyle = isCurrentlyLive;
+
+          return `
+          <div class="bg-white dark:bg-slate-900 border ${isLiveStyle ? 'border-emerald-400 dark:border-emerald-600 shadow-emerald-500/10 ring-2 ring-emerald-500/20' : 'border-slate-200/80 dark:border-slate-800'} rounded-3xl p-5 sm:p-6 bento-card relative">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               
               <div class="flex items-start gap-4">
                 <!-- Pair Number Pill -->
-                <div class="w-12 h-12 rounded-2xl ${c.isLive ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'} flex flex-col items-center justify-center shrink-0 font-bold">
+                <div class="w-12 h-12 rounded-2xl ${isLiveStyle ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'} flex flex-col items-center justify-center shrink-0 font-bold">
                   <span class="text-xs uppercase leading-none text-slate-400 dark:text-slate-400 font-normal">Пара</span>
                   <span class="text-lg leading-tight">${c.pairNumber}</span>
                 </div>
@@ -1461,9 +1553,9 @@ function renderScheduleScreen(student) {
                     <span class="font-mono text-xs font-semibold text-blue-600 dark:text-blue-400">${c.time}</span>
                     <span class="text-slate-300 dark:text-slate-700">•</span>
                     <span class="text-xs px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium">${c.type}</span>
-                    ${c.statusBadge ? `
-                      <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full ${c.statusBadge === 'Идет сейчас' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 pulse-badge' : c.statusBadge === 'Замена ауд.' ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 font-bold border border-rose-300 dark:border-rose-800 animate-pulse' : 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'}">
-                        ${c.statusBadge === 'Замена ауд.' ? '⚠️ ' : ''}${c.statusBadge}
+                    ${badgeText ? `
+                      <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full ${badgeText === 'Идет сейчас' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 pulse-badge' : badgeText === 'Замена ауд.' ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 font-bold border border-rose-300 dark:border-rose-800 animate-pulse' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'}">
+                        ${badgeText === 'Замена ауд.' ? '⚠️ ' : ''}${badgeText}
                       </span>
                     ` : ''}
                   </div>
@@ -1496,7 +1588,8 @@ function renderScheduleScreen(student) {
 
             </div>
           </div>
-        `).join('')}
+        `;
+        }).join('')}
       </div>
     ` : currentTab === 'week' ? `
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -1514,7 +1607,8 @@ function renderScheduleScreen(student) {
               `).join('')}
             </div>
           </div>
-        `).join('')}
+        `;
+        }).join('')}
       </div>
     ` : `
       <!-- Exam Schedule Tab -->
@@ -1911,7 +2005,8 @@ function renderAssistantScreen(student) {
               <div class="text-[10px] mt-2 opacity-60 text-right font-mono">${m.time}</div>
             </div>
           </div>
-        `).join('')}
+        `;
+        }).join('')}
       </div>
 
       <!-- Typing Indicator (hidden by default) -->
